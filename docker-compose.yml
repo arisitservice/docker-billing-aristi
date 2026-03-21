@@ -1,0 +1,27 @@
+services:
+  api:
+    build: ./Facturador-back
+    container_name: facturador-api
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Facturador-back:/src
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+    restart: unless-stopped
+
+  web:
+    build: ./facturador-web
+    container_name: facturador-web
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./facturador-web/.env
+    user: root
+    volumes:
+      - ./facturador-web:/usr/src
+      - /usr/src/node_modules
+    depends_on:
+      - api
+    restart: unless-stopped
