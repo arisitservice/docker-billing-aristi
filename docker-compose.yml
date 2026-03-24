@@ -1,4 +1,18 @@
 services:
+  db:
+    image: postgres:16
+    container_name: facturador-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=facturador
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_HOST_AUTH_METHOD=md5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
   api:
     build: ./Facturador-back
     container_name: facturador-api
@@ -9,6 +23,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__Default=Host=db;Port=5432;Database=facturador;Username=admin;Password=secret;SSL Mode=Disable
+    depends_on:
+      - db
     restart: unless-stopped
 
   web:
@@ -25,3 +42,6 @@ services:
     depends_on:
       - api
     restart: unless-stopped
+
+volumes:
+  postgres_data:
